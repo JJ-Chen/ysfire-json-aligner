@@ -1,0 +1,24 @@
+{
+  "name": "ysfire-json-aligner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local JSONC formatter and comment aligner for Chromium browsers",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test --experimental-test-coverage",
+    "check": "tsc",
+    "verify": "npm run check && npm test && npm run build"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

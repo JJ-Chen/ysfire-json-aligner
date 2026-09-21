@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title data-i18n="appTitle">JSON 注释对齐工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand">
+          <span class="logo" aria-hidden="true">{ // }</span>
+          <div>
+            <h1 data-i18n="appTitle">JSON 注释对齐工具</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="lang-toggle" class="lang-switch" type="button" data-i18n-title="langToggleTitle" title="切换语言">
+            <span id="lang-toggle-label" data-i18n="langToggleLabel">EN</span>
+            <span class="sr-only" data-i18n="langToggleSr">切换中文 / English</span>
+          </button>
+          <button id="theme-toggle" class="theme-switch" type="button"
+            role="switch" aria-checked="false" data-i18n-title="themeToNight" title="切换到暗黑主题">
+            <svg class="theme-switch-icon icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+            </svg>
+            <svg class="theme-switch-icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <span class="sr-only" data-i18n="themeToggleSr">切换日间 / 暗黑主题</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="toolbar" data-i18n-aria-label="toolbarAriaLabel" aria-label="格式化操作">
+        <div class="controls">
+          <button id="format" class="primary" type="button" data-i18n="formatButton">格式化并对齐</button>
+          <label for="indent" data-i18n="indentLabel">缩进</label>
+          <select id="indent">
+            <option value="2" data-i18n="indent2">2 个空格</option>
+            <option value="4" data-i18n="indent4">4 个空格</option>
+          </select>
+          <button id="sample" type="button" data-i18n="loadSampleButton">载入示例</button>
+          <button id="clear" type="button" data-i18n="clearButton">清空</button>
+        </div>
+      </section>
+
+      <div class="editors" id="editors">
+        <section class="editor-panel">
+          <div class="panel-header">
+            <label for="input"><span data-i18n="inputLabel">输入</span> <span>JSON / JSONC</span></label>
+            <span id="input-count">0 字符</span>
+          </div>
+          <div class="editor-body">
+            <div id="input-lines" class="line-numbers" aria-hidden="true">1</div>
+            <div class="code-editor">
+              <pre class="highlight" aria-hidden="true"><code id="input-highlight"></code></pre>
+              <textarea id="input" spellcheck="false" wrap="off"
+                autocapitalize="off" autocomplete="off" autocorrect="off"
+                data-i18n-placeholder="inputPlaceholder"
+                placeholder='在这里粘贴带注释的 JSON，例如：&#10;{&#10;  "name": "示例", //名称&#10;  "enabled": true //是否启用&#10;}'
+                aria-describedby="status"></textarea>
+            </div>
+          </div>
+        </section>
+        <div id="editors-splitter" class="splitter" role="separator" aria-orientation="vertical"
+          aria-label="调整输入输出编辑区域宽度" tabindex="0"></div>
+        <section class="editor-panel">
+          <div class="panel-header">
+            <label for="output"><span data-i18n="outputLabel">输出</span> <span data-i18n="outputLabelSpan">已对齐的 JSONC</span></label>
+            <div class="output-actions">
+              <button id="diff" type="button" disabled data-i18n="diffButton">对比差异</button>
+              <button id="copy" type="button" disabled data-i18n="copyButton">复制</button>
+              <button id="download" type="button" disabled data-i18n="downloadButton">下载 .jsonc</button>
+            </div>
+          </div>
+          <div class="editor-body">
+            <div id="output-lines" class="line-numbers" aria-hidden="true">1</div>
+            <div class="code-editor">
+              <pre class="highlight" aria-hidden="true"><code id="output-highlight"></code></pre>
+              <textarea id="output" spellcheck="false" wrap="off" readonly
+                data-i18n-placeholder="outputPlaceholder"
+                placeholder="格式化结果将显示在这里" aria-describedby="status"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <p id="status" role="status" aria-live="polite" aria-atomic="true" data-i18n="statusReady">
+        准备就绪，粘贴 JSON 后点击「格式化并对齐」。
+      </p>
+
+      <dialog id="diff-dialog" aria-labelledby="diff-title">
+        <div class="diff-header">
+          <h2 id="diff-title" data-i18n="diffTitle">格式化前后对比</h2>
+          <span id="diff-summary"></span>
+          <button id="diff-close" type="button" data-i18n-aria-label="diffClose" aria-label="关闭对比">✕</button>
+        </div>
+        <div id="diff-view" class="diff-view" role="group" data-i18n-aria-label="diffViewAriaLabel" aria-label="逐行差异，绿色为新增，红色为删除"></div>
+      </dialog>
+    </main>
+  </body>
+</html>

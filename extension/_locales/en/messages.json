@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "JSON Comment Aligner",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Formats JSON with comments locally, aligning every // comment while preserving fields, numbers and comment content.",
+    "description": "Extension description"
+  },
+  "extActionTitle": {
+    "message": "Open JSON Comment Aligner",
+    "description": "Toolbar icon tooltip"
+  }
+}

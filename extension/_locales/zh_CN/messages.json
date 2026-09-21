@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "JSON 注释对齐工具",
+    "description": "扩展名称"
+  },
+  "extDescription": {
+    "message": "本地格式化带注释的 JSON，全局对齐 // 注释，保留字段、数字和注释内容。",
+    "description": "扩展描述"
+  },
+  "extActionTitle": {
+    "message": "打开 JSON 注释对齐工具",
+    "description": "工具栏图标提示文字"
+  }
+}

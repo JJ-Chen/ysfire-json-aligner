@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "1.0.0",
+  "default_locale": "zh_CN",
+  "description": "__MSG_extDescription__",
+  "action": {
+    "default_title": "__MSG_extActionTitle__"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}
