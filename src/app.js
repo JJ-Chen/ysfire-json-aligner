@@ -24,7 +24,8 @@ const inputLines = element("input-lines", HTMLDivElement);
 const outputLines = element("output-lines", HTMLDivElement);
 const inputHighlight = element("input-highlight", HTMLElement);
 const outputHighlight = element("output-highlight", HTMLElement);
-const indent = element("indent", HTMLSelectElement);
+const indent = element("indent", HTMLDivElement);
+const keepLines = element("keep-lines", HTMLInputElement);
 const status = element("status", HTMLParagraphElement);
 const count = element("input-count", HTMLSpanElement);
 const copy = element("copy", HTMLButtonElement);
@@ -38,6 +39,12 @@ const langToggle = element("lang-toggle", HTMLButtonElement);
 /** @returns {"zh" | "en"} the formatter locale matching the active UI language */
 function formatterLocale() {
   return getLocale() === "zh-CN" ? "zh" : "en";
+}
+
+/** @returns {2 | 4} */
+function indentSize() {
+  const selected = indent.querySelector('input[name="indent"]:checked');
+  return selected instanceof HTMLInputElement && selected.value === "4" ? 4 : 2;
 }
 
 applyTranslations();
@@ -340,7 +347,8 @@ function renderDiff(before, after) {
 function runFormat() {
   try {
     const result = formatJsonc(input.value, {
-      indentSize: indent.value === "4" ? 4 : 2,
+      indentSize: indentSize(),
+      keepLines: keepLines.checked,
       locale: formatterLocale(),
     });
     output.value = result.text;
@@ -367,19 +375,37 @@ function runFormat() {
   }
 }
 
+/**
+ * Re-run formatting after a formatting option changes, while avoiding a
+ * surprising syntax error when the editor is still empty.
+ * @param {string} emptyMessage
+ */
+function rerunFormatAfterOptionChange(emptyMessage) {
+  if (input.value.trim()) {
+    runFormat();
+  } else {
+    invalidate();
+    notify(emptyMessage);
+  }
+}
+
 input.addEventListener("input", () => {
   invalidate();
   notify(t("inputUpdated"));
 });
 input.addEventListener("scroll", () => updateLineNumbers(input, inputLines));
 output.addEventListener("scroll", () => updateLineNumbers(output, outputLines));
-indent.addEventListener("change", () => {
-  input.style.tabSize = indent.value;
-  output.style.tabSize = indent.value;
-  inputHighlight.parentElement?.style.setProperty("tab-size", indent.value);
-  outputHighlight.parentElement?.style.setProperty("tab-size", indent.value);
-  invalidate();
-  notify(t("indentUpdated"));
+indent.addEventListener("change", (event) => {
+  if (!(event.target instanceof HTMLInputElement)) return;
+  const value = String(indentSize());
+  input.style.tabSize = value;
+  output.style.tabSize = value;
+  inputHighlight.parentElement?.style.setProperty("tab-size", value);
+  outputHighlight.parentElement?.style.setProperty("tab-size", value);
+  rerunFormatAfterOptionChange(t("indentUpdated"));
+});
+keepLines.addEventListener("change", () => {
+  rerunFormatAfterOptionChange(t("keepLinesUpdated"));
 });
 element("format", HTMLButtonElement).addEventListener("click", runFormat);
 element("sample", HTMLButtonElement).addEventListener("click", () => {

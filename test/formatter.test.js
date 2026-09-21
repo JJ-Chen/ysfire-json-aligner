@@ -143,6 +143,14 @@ test("supports four-space indentation", () => {
     '{\n    "a": {\n        "b": [\n            1\n        ]\n    }\n}\n');
 });
 
+test("can preserve original line breaks with the formatter keepLines option", () => {
+  const source = '{"channels":[1500,1500,1100,1500],"pair":{"a":1,"b":2}//ok\n}';
+  const result = formatJsonc(source, { keepLines: true });
+  assert.equal(result.text, '{ "channels": [ 1500, 1500, 1100, 1500 ], "pair": { "a": 1, "b": 2 } // ok\n}\n');
+  assert.equal(result.commentCount, 1);
+  assert.deepEqual(tokens(result.text), tokens(source));
+});
+
 for (const [source, expected] of [
   ["{}", "{}\n"],
   ["[]", "[]\n"],

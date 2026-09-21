@@ -40,11 +40,23 @@
       <section class="toolbar" data-i18n-aria-label="toolbarAriaLabel" aria-label="格式化操作">
         <div class="controls">
           <button id="format" class="primary" type="button" data-i18n="formatButton">格式化并对齐</button>
-          <label for="indent" data-i18n="indentLabel">缩进</label>
-          <select id="indent">
-            <option value="2" data-i18n="indent2">2 个空格</option>
-            <option value="4" data-i18n="indent4">4 个空格</option>
-          </select>
+          <div id="indent" class="segmented-control" role="radiogroup" data-i18n-aria-label="indentLabel" aria-label="缩进">
+            <label class="segment-option">
+              <input type="radio" name="indent" value="2" checked>
+              <span data-i18n="indent2">2 个空格</span>
+            </label>
+            <label class="segment-option">
+              <input type="radio" name="indent" value="4">
+              <span data-i18n="indent4">4 个空格</span>
+            </label>
+          </div>
+          <label class="keep-lines-toggle" for="keep-lines">
+            <input id="keep-lines" type="checkbox">
+            <span class="toggle-track" aria-hidden="true">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span data-i18n="keepLinesLabel">保留原始换行</span>
+          </label>
           <button id="sample" type="button" data-i18n="loadSampleButton">载入示例</button>
           <button id="clear" type="button" data-i18n="clearButton">清空</button>
         </div>

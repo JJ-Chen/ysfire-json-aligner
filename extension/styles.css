@@ -64,6 +64,15 @@ button.primary { background: var(--accent); color: var(--accent-fg); border-colo
 button.primary:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 88%, black); border-color: color-mix(in srgb, var(--accent) 88%, black); }
 button:disabled { opacity: .4; cursor: not-allowed; }
 button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.controls > button,
+.segmented-control,
+.keep-lines-toggle {
+  height: 34px;
+}
+.controls > button {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -129,6 +138,116 @@ button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2p
 }
 .lang-switch:hover { border-color: var(--border-strong); background: var(--surface-sunken); }
 .shortcut, .controls label { font-size: 12.5px; color: var(--muted); }
+.segmented-control {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+}
+.segment-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .12s ease, color .12s ease;
+}
+.segment-option + .segment-option {
+  border-left: 1px solid var(--border);
+}
+.segment-option:hover {
+  background: var(--surface-sunken);
+}
+.segment-option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.segment-option span {
+  pointer-events: none;
+}
+.segment-option:has(input:checked) {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+.segment-option:has(input:focus-visible) {
+  z-index: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.keep-lines-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+.keep-lines-toggle:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-sunken);
+}
+.keep-lines-toggle input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.toggle-track {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  pointer-events: none;
+  transition: background-color .14s ease, border-color .14s ease;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--accent-fg);
+  border-width: 0 2px 2px 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(45deg);
+  transition: opacity .14s ease;
+}
+.keep-lines-toggle:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.keep-lines-toggle:has(input:checked) .toggle-track {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.keep-lines-toggle:has(input:checked) .toggle-thumb {
+  opacity: 1;
+}
+.keep-lines-toggle:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .editors { display: flex; align-items: stretch; }
 .editor-panel {
   min-width: 0;

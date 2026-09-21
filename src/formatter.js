@@ -81,10 +81,10 @@ const genericMessages = {
 /**
  * Format JSONC without serializing values, then align actual line-comment tokens.
  * @param {string} source
- * @param {{ indentSize?: 2 | 4, locale?: "zh" | "en" }} [options]
+ * @param {{ indentSize?: 2 | 4, keepLines?: boolean, locale?: "zh" | "en" }} [options]
  * @returns {{ text: string, commentCount: number, commentColumn: number | null }}
  */
-export function formatJsonc(source, { indentSize = 2, locale = "zh" } = {}) {
+export function formatJsonc(source, { indentSize = 2, keepLines = false, locale = "zh" } = {}) {
   const messages = genericMessages[locale] ?? genericMessages.zh;
   if (typeof source !== "string") {
     throw new TypeError(messages.invalidInput);
@@ -110,7 +110,7 @@ export function formatJsonc(source, { indentSize = 2, locale = "zh" } = {}) {
       tabSize: indentSize,
       insertSpaces: true,
       eol: "\n",
-      keepLines: false,
+      keepLines,
       insertFinalNewline: true,
     }),
   );
