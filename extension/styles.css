@@ -36,17 +36,14 @@ header { margin-bottom: 24px; flex-wrap: wrap; }
 .header-actions { flex-wrap: wrap; justify-content: flex-end; gap: 16px; }
 .brand { gap: 14px; }
 .logo {
-  display: grid;
-  place-items: center;
   flex-shrink: 0;
-  white-space: nowrap;
   width: 38px;
   height: 38px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  color: var(--accent);
-  font: 600 12px var(--code);
-  letter-spacing: -0.03em;
+}
+.logo-image {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
 .toolbar { margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }

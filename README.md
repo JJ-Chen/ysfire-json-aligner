@@ -16,7 +16,7 @@ npm run verify
 1. Chrome 打开 `chrome://extensions`；Edge 打开 `edge://extensions`。
 2. 开启「开发者模式」。
 3. 点击「加载已解压的扩展程序」，选择本项目的 **dist 文件夹**，不要选择项目根目录。
-4. 将扩展固定到工具栏，点击「JSON 注释对齐工具」图标。
+4. 将扩展固定到工具栏，点击带有 `{ // }` 标识的「JSON 注释对齐工具」图标。
 
 安装后完全离线运行，无需 Node.js 或开发服务器。源码更新后运行 `npm run build`，在扩展管理页刷新扩展并重新打开编辑页。
 
@@ -77,6 +77,7 @@ npm run build  # 打包可直接安装的扩展
 - [src/app.js](./src/app.js)：编辑器交互及错误反馈。
 - [src/i18n.js](./src/i18n.js)：中文 / English 界面文案字典与 `data-i18n*` 属性驱动的翻译辅助函数。
 - [extension/manifest.json](./extension/manifest.json)：Manifest V3 配置。
+- [extension/icons](./extension/icons)：扩展图标资源，沿用页头 `{ // }` 标识生成多尺寸 PNG。
 - [extension/_locales](./extension/_locales)：Chrome 扩展名称、描述等元数据的多语言文案（`chrome.i18n`）。
 - [test/formatter.test.js](./test/formatter.test.js)：完整示例、字符串与注释区分、嵌套对齐、Unicode、长字段、大整数、错误输入等测试。
 - [test/highlight.test.js](./test/highlight.test.js)：着色分类、HTML 转义、错误容忍和字符无损还原等测试。

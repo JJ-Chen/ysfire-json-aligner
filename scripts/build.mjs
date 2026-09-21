@@ -9,6 +9,7 @@ for (const file of ["manifest.json", "background.js", "index.html", "styles.css"
   await cp(new URL(`extension/${file}`, root), new URL(file, destination));
 }
 await cp(new URL("extension/_locales", root), new URL("_locales", destination), { recursive: true });
+await cp(new URL("extension/icons", root), new URL("icons", destination), { recursive: true });
 await cp(
   new URL("node_modules/jsonc-parser/LICENSE.md", root),
   new URL("THIRD-PARTY-NOTICES.txt", destination),
