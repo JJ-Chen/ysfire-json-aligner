@@ -38,6 +38,44 @@ test("formats a document and places every // at a known global column", () => {
   });
 });
 
+test("shifts every // left to a requested column, keeping at least 1 space where a field is too long", () => {
+  const natural = formatJsonc(sample);
+  assert.equal(natural.commentColumn, 57);
+  const shifted = formatJsonc(sample, { commentColumn: natural.commentColumn - 8 });
+  assert.equal(shifted.commentColumn, 49);
+  const aligned = comments(shifted.text);
+  assert.equal(aligned.length, natural.commentCount);
+  const target = 49;
+  for (const comment of aligned) {
+    // Lines short enough reach the requested column exactly; lines whose
+    // own content is too long to fit keep at least 1 space before `//`
+    // instead of forcing every other line further right.
+    assert.ok(comment.column === target || comment.column > target);
+    assert.match(comment.prefix, /\S +$/u);
+  }
+  assert.ok(aligned.some((comment) => comment.column === target));
+  assert.ok(aligned.some((comment) => comment.column > target));
+  assert.deepEqual(tokens(shifted.text), tokens(sample));
+});
+
+test("shifts every // right to a requested column beyond the natural width", () => {
+  const natural = formatJsonc(sample);
+  const shifted = formatJsonc(sample, { commentColumn: natural.commentColumn + 5 });
+  const aligned = comments(shifted.text);
+  assert.equal(shifted.commentColumn, natural.commentColumn + 5);
+  assert.equal(new Set(aligned.map((comment) => comment.column)).size, 1);
+  for (const comment of aligned) {
+    assert.equal(comment.column, shifted.commentColumn);
+  }
+});
+
+test("ignores a non-positive or non-integer commentColumn override and falls back to the natural column", () => {
+  const natural = formatJsonc('{"a":1,//a\n"long":2//    b   \n}');
+  for (const invalid of [0, -1, 1.5]) {
+    assert.deepEqual(formatJsonc('{"a":1,//a\n"long":2//    b   \n}', { commentColumn: invalid }), natural);
+  }
+});
+
 test("formats the complete sample, preserving every token and comment", () => {
   const result = formatJsonc(sample);
   const aligned = comments(result.text);

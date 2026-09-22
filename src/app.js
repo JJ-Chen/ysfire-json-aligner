@@ -35,6 +35,9 @@ const diffDialog = element("diff-dialog", HTMLDialogElement);
 const diffView = element("diff-view", HTMLDivElement);
 const diffSummary = element("diff-summary", HTMLSpanElement);
 const langToggle = element("lang-toggle", HTMLButtonElement);
+const commentColumnValue = element("comment-column-value", HTMLInputElement);
+const commentColumnLeft = element("comment-column-left", HTMLButtonElement);
+const commentColumnRight = element("comment-column-right", HTMLButtonElement);
 
 /** @returns {"zh" | "en"} the formatter locale matching the active UI language */
 function formatterLocale() {
@@ -215,6 +218,46 @@ function notify(message, tone = "info") {
   status.dataset.tone = tone;
 }
 
+// Smallest and largest 1-based `//` column a user can shift alignment to
+// with the toolbar's < / > buttons.
+const MIN_COMMENT_COLUMN = 1;
+const MAX_COMMENT_COLUMN = 400;
+
+/** Requested `//` column for the next format, or `null` to use the natural (widest-line) column. @type {number | null} */
+let commentColumnOverride = null;
+
+/** Reset the comment-column control to its empty, disabled state. */
+function resetCommentColumnControl() {
+  currentCommentColumn = null;
+  commentColumnValue.value = "";
+  commentColumnValue.placeholder = t("commentColumnPlaceholder");
+  commentColumnValue.disabled = true;
+  commentColumnLeft.disabled = true;
+  commentColumnRight.disabled = true;
+}
+
+/** Currently applied `//` column, mirrored by the toolbar shift buttons; `null` before a successful format. @type {number | null} */
+let currentCommentColumn = null;
+
+/**
+ * Reflect the active `//` column in the toolbar and enable/disable the
+ * shift buttons at the configured bounds.
+ * @param {number | null} column
+ */
+function updateCommentColumnControl(column) {
+  currentCommentColumn = column;
+  if (column === null) {
+    resetCommentColumnControl();
+    return;
+  }
+  commentColumnValue.value = String(column);
+  commentColumnValue.disabled = false;
+  commentColumnLeft.disabled = column <= MIN_COMMENT_COLUMN;
+  commentColumnRight.disabled = column >= MAX_COMMENT_COLUMN;
+}
+
+resetCommentColumnControl();
+
 /** @param {HTMLTextAreaElement} textarea @param {HTMLDivElement} lineNumbers */
 function updateLineNumbers(textarea, lineNumbers) {
   const lineCount = textarea.value.split("\n").length;
@@ -237,6 +280,8 @@ function invalidate() {
   input.removeAttribute("aria-invalid");
   renderHighlight(input, inputHighlight);
   renderHighlight(output, outputHighlight);
+  commentColumnOverride = null;
+  updateCommentColumnControl(null);
 }
 
 /**
@@ -350,6 +395,7 @@ function runFormat() {
       indentSize: indentSize(),
       keepLines: keepLines.checked,
       locale: formatterLocale(),
+      commentColumn: commentColumnOverride,
     });
     output.value = result.text;
     updateAllLineNumbers();
@@ -359,6 +405,7 @@ function runFormat() {
     diffButton.disabled = false;
     renderHighlight(input, inputHighlight);
     renderHighlight(output, outputHighlight);
+    updateCommentColumnControl(result.commentColumn);
     const detail = result.commentCount
       ? t("alignedDetail", { count: result.commentCount, column: result.commentColumn ?? 0 })
       : t("noCommentsDetail");
@@ -406,6 +453,94 @@ indent.addEventListener("change", (event) => {
 });
 keepLines.addEventListener("change", () => {
   rerunFormatAfterOptionChange(t("keepLinesUpdated"));
+});
+/** @param {-1 | 1} direction */
+function shiftCommentColumn(direction) {
+  if (currentCommentColumn === null) return;
+  const next = Math.min(MAX_COMMENT_COLUMN, Math.max(MIN_COMMENT_COLUMN, currentCommentColumn + direction));
+  if (next === currentCommentColumn) return;
+  commentColumnOverride = next;
+  runFormat();
+}
+
+function applyEditedCommentColumn() {
+  if (currentCommentColumn === null) return;
+  const edited = Number(commentColumnValue.value);
+  if (!Number.isInteger(edited) || edited < MIN_COMMENT_COLUMN || edited > MAX_COMMENT_COLUMN) {
+    commentColumnValue.value = String(currentCommentColumn);
+    return;
+  }
+  if (edited === currentCommentColumn) return;
+  commentColumnOverride = edited;
+  runFormat();
+}
+
+// Holding a shift button down repeats the shift, like a spinner control:
+// a short delay before the first repeat avoids over-triggering on a
+// normal tap, then it repeats steadily until the pointer is released.
+const COLUMN_HOLD_DELAY_MS = 450;
+const COLUMN_HOLD_REPEAT_MS = 80;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let columnHoldTimer = null;
+/** @type {ReturnType<typeof setInterval> | null} */
+let columnHoldInterval = null;
+let columnHoldTriggered = false;
+
+/** @param {-1 | 1} direction */
+function startColumnHold(direction) {
+  columnHoldTriggered = false;
+  columnHoldTimer = setTimeout(() => {
+    columnHoldTriggered = true;
+    shiftCommentColumn(direction);
+    columnHoldInterval = setInterval(() => shiftCommentColumn(direction), COLUMN_HOLD_REPEAT_MS);
+  }, COLUMN_HOLD_DELAY_MS);
+}
+
+function stopColumnHold() {
+  if (columnHoldTimer !== null) {
+    clearTimeout(columnHoldTimer);
+    columnHoldTimer = null;
+  }
+  if (columnHoldInterval !== null) {
+    clearInterval(columnHoldInterval);
+    columnHoldInterval = null;
+  }
+}
+
+/**
+ * Wire a shift button for both a plain click/keyboard activation and a
+ * held-pointer repeat.
+ * @param {HTMLButtonElement} button
+ * @param {-1 | 1} direction
+ */
+function bindColumnShiftButton(button, direction) {
+  button.addEventListener("pointerdown", (event) => {
+    if (button.disabled || event.button !== 0) return;
+    startColumnHold(direction);
+  });
+  button.addEventListener("pointerup", stopColumnHold);
+  button.addEventListener("pointerleave", stopColumnHold);
+  button.addEventListener("pointercancel", stopColumnHold);
+  button.addEventListener("click", () => {
+    // A completed hold already shifted the column via the repeat interval;
+    // the click that follows pointerup must not shift it again.
+    if (columnHoldTriggered) {
+      columnHoldTriggered = false;
+      return;
+    }
+    shiftCommentColumn(direction);
+  });
+}
+
+bindColumnShiftButton(commentColumnLeft, -1);
+bindColumnShiftButton(commentColumnRight, 1);
+commentColumnValue.addEventListener("change", applyEditedCommentColumn);
+commentColumnValue.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    applyEditedCommentColumn();
+    commentColumnValue.blur();
+  }
 });
 element("format", HTMLButtonElement).addEventListener("click", runFormat);
 element("sample", HTMLButtonElement).addEventListener("click", () => {

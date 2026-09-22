@@ -81,10 +81,10 @@ const genericMessages = {
 /**
  * Format JSONC without serializing values, then align actual line-comment tokens.
  * @param {string} source
- * @param {{ indentSize?: 2 | 4, keepLines?: boolean, locale?: "zh" | "en" }} [options]
+ * @param {{ indentSize?: 2 | 4, keepLines?: boolean, locale?: "zh" | "en", commentColumn?: number | null }} [options]
  * @returns {{ text: string, commentCount: number, commentColumn: number | null }}
  */
-export function formatJsonc(source, { indentSize = 2, keepLines = false, locale = "zh" } = {}) {
+export function formatJsonc(source, { indentSize = 2, keepLines = false, locale = "zh", commentColumn = null } = {}) {
   const messages = genericMessages[locale] ?? genericMessages.zh;
   if (typeof source !== "string") {
     throw new TypeError(messages.invalidInput);
@@ -115,9 +115,9 @@ export function formatJsonc(source, { indentSize = 2, keepLines = false, locale 
     }),
   );
   const scanner = createScanner(formatted, false);
-  /** @type {{ start: number, end: number, width: number, content: string }[]} */
+  /** @type {{ start: number, end: number, width: number, minimum: number, content: string }[]} */
   const comments = [];
-  let column = 0;
+  let naturalColumn = 0;
   let lineStart = 0;
   for (
     let kind = scanner.scan();
@@ -138,23 +138,35 @@ export function formatJsonc(source, { indentSize = 2, keepLines = false, locale 
     const code = prefix.trimEnd();
     const width = Array.from(code).length;
     const minimum = code.length ? width + 1 : Array.from(prefix).length;
-    column = Math.max(column, minimum);
+    naturalColumn = Math.max(naturalColumn, minimum);
     comments.push({
       start: lineStart + code.length,
       end: offset + scanner.getTokenLength(),
       width,
+      minimum,
       content: formatted.slice(offset + 2, offset + scanner.getTokenLength()).trim(),
     });
   }
 
-  const edits = comments.map((comment) => ({
-    offset: comment.start,
-    length: comment.end - comment.start,
-    content: `${" ".repeat(column - comment.width)}// ${comment.content}`,
-  }));
+  // A caller can request a specific target column (e.g. to shift the whole
+  // document's comments left/right). Lines whose own content is too long to
+  // reach that column keep at least 1 space before `//` instead of forcing
+  // every other line further right to stay uniform.
+  const target = typeof commentColumn === "number" && Number.isInteger(commentColumn) && commentColumn > 0
+    ? commentColumn - 1
+    : naturalColumn;
+
+  const edits = comments.map((comment) => {
+    const width = Math.max(target, comment.minimum);
+    return {
+      offset: comment.start,
+      length: comment.end - comment.start,
+      content: `${" ".repeat(width - comment.width)}// ${comment.content}`,
+    };
+  });
   return {
     text: applyEdits(formatted, edits),
     commentCount: comments.length,
-    commentColumn: comments.length ? column + 1 : null,
+    commentColumn: comments.length ? target + 1 : null,
   };
 }

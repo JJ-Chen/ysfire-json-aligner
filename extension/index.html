@@ -57,6 +57,27 @@
             </span>
             <span data-i18n="keepLinesLabel">保留原始换行</span>
           </label>
+          <div id="comment-column" class="comment-column-control" data-i18n-aria-label="commentColumnGroupLabel" aria-label="注释对齐列">
+            <button id="comment-column-left" type="button" disabled
+              data-i18n-title="commentColumnLeftTitle" title="向左移动注释列"
+              data-i18n-aria-label="commentColumnLeftTitle" aria-label="向左移动注释列">
+              <svg class="comment-column-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6"></path>
+              </svg>
+            </button>
+            <input id="comment-column-value" class="comment-column-value" type="number"
+              min="1" max="400" step="1" inputmode="numeric" disabled
+              data-i18n-title="commentColumnInputTitle" title="编辑注释对齐列"
+              data-i18n-aria-label="commentColumnInputTitle" aria-label="编辑注释对齐列"
+              placeholder="—">
+            <button id="comment-column-right" type="button" disabled
+              data-i18n-title="commentColumnRightTitle" title="向右移动注释列"
+              data-i18n-aria-label="commentColumnRightTitle" aria-label="向右移动注释列">
+              <svg class="comment-column-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 6l6 6-6 6"></path>
+              </svg>
+            </button>
+          </div>
           <button id="sample" type="button" data-i18n="loadSampleButton">载入示例</button>
           <button id="clear" type="button" data-i18n="clearButton">清空</button>
         </div>
