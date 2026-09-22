@@ -73,6 +73,22 @@ npm test       # Node.js 内置测试与覆盖率
 npm run build  # 打包可直接安装的扩展
 ```
 
+## 发布
+
+发布分两步：先整理面向用户的发布说明，再执行封板打包。
+
+```powershell
+npm run release -- --show-changes                   # 查看自上次发布以来的提交与改动（只读）
+npm run release -- --notes release-notes.md         # 封板并升级补丁号（默认），如 1.0.0 -> 1.0.1
+npm run release -- minor --notes release-notes.md   # 升级次版本号，如 1.0.0 -> 1.1.0
+npm run release -- major --notes release-notes.md   # 升级主版本号，如 1.0.0 -> 2.0.0
+npm run release -- 1.2.0 --notes release-notes.md   # 直接指定目标版本号
+```
+
+`--show-changes` 输出的提交记录只是素材，需要改写成面向使用者的更新内容（按 `### 新增` / `### 改进` / `### 修复` 分类，合并同一功能的多次提交，略过纯内部改动），写入一个临时文件后通过 `--notes` 传入。发布说明缺失、为空或与提交记录逐条相同时，脚本会拒绝发布。
+
+[scripts/release.mjs](./scripts/release.mjs) 随后依次执行类型检查和测试（封板）、同步升级 `package.json` 与 `extension/manifest.json` 的版本号、在 [CHANGELOG.md](./CHANGELOG.md) 顶部写入本次发布说明、重新构建，最后将 `dist/` 打包为 `JsonAligner-<版本号>.zip` 写入项目根目录。任一步失败都会终止，不写入版本号、不更新日志也不生成 zip。
+
 - [src/formatter.js](./src/formatter.js)：JSONC 校验、格式化和注释对齐。
 - [src/highlight.js](./src/highlight.js)：JSONC 代码着色，将文本转换为带高亮 `<span>` 的 HTML。
 - [src/diff.js](./src/diff.js)：逐行与逐字符 Myers 差异算法，并按内容相似度将改动行配对，供「对比差异」弹窗使用。
