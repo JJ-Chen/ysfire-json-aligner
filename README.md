@@ -40,6 +40,8 @@ npm run verify
 
 ## 使用
 
+![JSON 注释对齐工具使用示例](./assets/json-aligner-example.png)
+
 - 在左栏粘贴 JSON / JSONC，点击「格式化并对齐」，或按 `Ctrl+Enter` / `⌘+Enter`。
 - 输入和输出均有实时代码着色：属性名、字符串、数字、`true`/`false`/`null`、注释和标点符号分别用不同颜色显示，随输入即时更新，无语法错误也不影响正常编辑。
 - 默认 2 个空格缩进，可切换为 4 个空格。
