@@ -1,6 +1,22 @@
 # JSON 注释对齐工具
 
-适用于 Chrome、Edge 等 Chromium 浏览器的 Manifest V3 插件。点击扩展图标，在独立标签页中粘贴带注释的 JSON，格式化并全局对齐 `//` 注释。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+一个面向 Chromium 浏览器的本地 JSONC 格式化与注释对齐工具。
+
+它以 Manifest V3 扩展的形式运行在 Chrome、Edge 等 Chromium 浏览器中，帮助开发者整理带有 `//` 或 `/* ... */` 注释的 JSONC 文件。所有处理都在本地完成，不上传输入内容，也不依赖在线服务。
+
+## 项目特点
+
+- 支持 JSONC 校验、格式化、尾随逗号和注释保留。
+- 将多行 `//` 注释统一对齐到同一列，并允许手动调整注释列。
+- 提供实时语法着色、行号、错误位置提示和格式化前后差异对比。
+- 支持中文与 English、日间与暗黑外观，以及 2 / 4 空格缩进。
+- 无站点权限、无远程资源、无数据上传，适合处理本地配置文件。
+
+## 隐私与安全
+
+扩展只处理当前页面中的文本，不读取浏览历史、不注入网页，也不使用浏览器存储保存输入。复制和下载仅在用户主动操作时执行。
 
 ## 构建与安装
 
@@ -65,6 +81,17 @@ npm run verify
 
 所有资源随扩展打包，不加载 CDN，不上传文本，不注入网页，不读取浏览历史，也不申请站点权限。仅在用户点击复制时写入剪贴板，点击下载时生成本地文件。输入不写入浏览器存储。
 
+## 参与开发
+
+欢迎提交 Issue 反馈问题、提出改进建议，或通过 Pull Request 贡献代码。提交前请先确认改动范围，并运行完整验证命令：
+
+```powershell
+npm ci
+npm run verify
+```
+
+请在 Issue 或 Pull Request 中说明复现步骤、预期行为和实际行为；涉及 JSONC 边界情况时，附上最小可复现输入会更容易处理。
+
 ## 开发与验证
 
 ```powershell
@@ -89,6 +116,8 @@ npm run release -- 1.2.0 --notes release-notes.md   # 直接指定目标版本�
 
 [scripts/release.mjs](./scripts/release.mjs) 随后依次执行类型检查和测试（封板）、同步升级 `package.json` 与 `extension/manifest.json` 的版本号、在 [CHANGELOG.md](./CHANGELOG.md) 顶部写入本次发布说明、重新构建，最后将 `dist/` 打包为 `JsonAligner-<版本号>.zip` 写入项目根目录。任一步失败都会终止，不写入版本号、不更新日志也不生成 zip。
 
+## 项目结构
+
 - [src/formatter.js](./src/formatter.js)：JSONC 校验、格式化和注释对齐。
 - [src/highlight.js](./src/highlight.js)：JSONC 代码着色，将文本转换为带高亮 `<span>` 的 HTML。
 - [src/diff.js](./src/diff.js)：逐行与逐字符 Myers 差异算法，并按内容相似度将改动行配对，供「对比差异」弹窗使用。
@@ -104,3 +133,7 @@ npm run release -- 1.2.0 --notes release-notes.md   # 直接指定目标版本�
 未使用压缩或替换源码的正则来识别注释，也未使用 `eval` 执行输入。
 
 运行时依赖 `jsonc-parser`，其 MIT 许可证随构建复制到 `dist/THIRD-PARTY-NOTICES.txt`。
+
+## 许可证
+
+本项目采用 [MIT License](./LICENSE) 开源。除本项目代码外，第三方依赖的许可和版权信息以构建产物中的 `dist/THIRD-PARTY-NOTICES.txt` 为准。
